@@ -4,14 +4,14 @@
       <!-- 面包屑 -->
       <SubBread />
       <!-- 筛选区 -->
-      <SubFilter />
+      <SubFilter @filter-change="filterChange" />
       <div class="goods-list">
         <!-- 排序 -->
-        <SubSort />
+        <SubSort @sort-change="sortChange" />
         <!-- 列表 -->
         <ul>
-          <li v-for="i in 20" :key="i">
-            <GoodsItem :good="{}" />
+          <li v-for="goods in goodsList" :key="goods.id">
+            <GoodsItem :good="goods" />
           </li>
         </ul>
         <!-- 无限加载组件 -->
@@ -26,12 +26,13 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import SubBread from './components/sub-bread'
 import SubFilter from './components/sub-filter'
 import SubSort from './components/sub-sort'
 import GoodsItem from './components/goods-item.vue'
-
+import { findSubCategoryGoods } from '@/api/category'
+import { useRoute } from 'vue-router'
 export default {
   name: 'SubCategory',
   components: {
@@ -41,19 +42,66 @@ export default {
     GoodsItem
   },
   setup () {
-    const isAllChecked = ref(true)
+    const route = useRoute()
+    // 加载中
     const loading = ref(false)
+    // 是否加载完毕
     const finished = ref(false)
+    // 商品列表数据
+    const goodsList = ref([])
+    // 请求参数
+    let reqParams = {
+      page: 1,
+      pageSize: 20
+    }
     const getData = () => {
-      // 加载数据
-      alert('正在加载数据')
+      loading.value = true
+      // 设置二级分类的ID
+      reqParams.categoryId = route.params.id
+      findSubCategoryGoods(reqParams).then(({ result }) => {
+        // 获取数据
+        if (result.items.length) {
+          goodsList.value.push(...result.items)
+          loading.value = false
+          reqParams.page++
+        } else {
+          // 没有数据代表加载完成
+          finished.value = true
+        }
+        loading.value = false
+      })
+    }
+    // 更改了二级分类的时候需要重新加载
+    watch(() => route.params.id, (newVal) => {
+      if (newVal && `/category/sub/${newVal}` === route.path) {
+        finished.value = false
+        goodsList.value = []
+        reqParams = {
+          page: 1,
+          pageSize: 20
+        }
+      }
+    })
+    // 1 更改排序组件的筛选苏韩剧，重新请求
+    const sortChange = (sortParams) => {
+      finished.value = false
+      // 合并请求参数 保留之前的参数
+      reqParams = { ...reqParams, ...sortParams }
+      reqParams.page = 1
+      goodsList.value = []
+    }
+    // 2.更改筛选组件的筛选数据，重新请求
+    const filterChange = (filterParams) => {
+      console.log(filterParams)
     }
     return {
-      isAllChecked,
       GoodsItem,
       loading,
       finished,
-      getData
+      getData,
+      goodsList,
+      sortChange,
+      filterChange
     }
   }
 }
