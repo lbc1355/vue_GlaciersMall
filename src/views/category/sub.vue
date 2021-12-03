@@ -92,7 +92,11 @@ export default {
     }
     // 2.更改筛选组件的筛选数据，重新请求
     const filterChange = (filterParams) => {
-      console.log(filterParams)
+      finished.value = false
+      // 合并请求保留之前的参数
+      reqParams = { ...reqParams, ...filterParams }
+      reqParams.page = 1
+      goodsList.value = []
     }
     return {
       GoodsItem,

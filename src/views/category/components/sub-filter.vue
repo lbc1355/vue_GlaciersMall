@@ -83,6 +83,9 @@ export default {
           obj.attrs.push({ groupName: item.name, propertyName: prop.name })
         }
       })
+      if (obj.attrs.length === 0) {
+        obj.attrs = null
+      }
       return obj
     }
     // 记录当前选择的品牌
