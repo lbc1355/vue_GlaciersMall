@@ -71,7 +71,7 @@ export default {
       }
     }, { immediate: true })
 
-    // 后去筛选参数的函数
+    // 获取筛选参数的函数
     const getFilterParams = () => {
       const obj = { brandId: null, attrs: [] }
       // 品牌
@@ -80,7 +80,7 @@ export default {
       filterData.value.saleProperties.forEach(item => {
         if (item.selectedProp) {
           const prop = item.properties.find(prop => prop.id === item.selectedProp)
-          obj.attrs.push({ groupName: item.name, propertyName: prop.name })
+          obj.attrs.push({ groupId: item.id, groupName: item.name, propertyName: prop.name, propertiesId: prop.id })
         }
       })
       if (obj.attrs.length === 0) {

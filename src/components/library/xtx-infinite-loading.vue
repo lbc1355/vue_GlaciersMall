@@ -30,15 +30,15 @@ export default {
     const container = ref(null)
     useIntersectionObserver(
       container,
-      ([{ isIntersecting }], dom) => {
+      ([{ isIntersecting }]) => {
         if (isIntersecting) {
-          if (props.loading === false && props.finished === false) {
+          if (!props.loading && !props.finished) {
             emit('infinite')
           }
         }
       },
       {
-        threshold: 0
+        threshold: 0.01
       }
     )
     return { container }

@@ -11,8 +11,8 @@ import store from '@/store'
 import router from '@/router'
 
 // 导出基准地址 原因将来有些地方不是通过axios发请求的地方用上基准地址
-export const baseURL = 'http://pcapi-xiaotuxian-front.itheima.net/'
-// export const baseURL = 'http://localhost:9000/glaciersmall/'
+// export const baseURL = 'http://pcapi-xiaotuxian-front.itheima.net/'
+export const baseURL = 'http://localhost:9000/glaciersmall/'
 
 const instance = axios.create({
   baseURL,
@@ -23,9 +23,9 @@ const instance = axios.create({
 instance.interceptors.request.use(
 
   function (config) {
-  // 拦截业务逻辑
-  // 进行请求配置的修改
-  // 如果本地有token就在头部携带
+    // 拦截业务逻辑
+    // 进行请求配置的修改
+    // 如果本地有token就在头部携带
 
     // 1 获取用户信息对象
     const { profile } = store.state.user
