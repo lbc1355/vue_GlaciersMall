@@ -11,8 +11,8 @@ import store from '@/store'
 import router from '@/router'
 
 // 导出基准地址 原因将来有些地方不是通过axios发请求的地方用上基准地址
-// export const baseURL = 'http://pcapi-xiaotuxian-front.itheima.net/'
-export const baseURL = 'http://localhost:9000/glaciersmall/'
+export const baseURL = 'http://pcapi-xiaotuxian-front.itheima.net/'
+// export const baseURL = 'http://localhost:9000/glaciersmall/'
 
 const instance = axios.create({
   baseURL,

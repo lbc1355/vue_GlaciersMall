@@ -4,6 +4,8 @@ const Layout = () => import('@/views/Layout')
 const Home = () => import('@/views/home')
 const TopCaegory = () => import('@/views/category/index')
 const SubCaegory = () => import('@/views/category/sub')
+const Goods = () => import('@/views/goods/index')
+
 // 路由规则
 const routes = [
   // 一级路由布局容器
@@ -13,7 +15,9 @@ const routes = [
     children: [
       { path: '/', component: Home },
       { path: '/category/:id', component: TopCaegory },
-      { path: '/category/sub/:id', component: SubCaegory }
+      { path: '/category/sub/:id', component: SubCaegory },
+      { path: '/product/:id', component: Goods }
+
     ]
   }
 ]
