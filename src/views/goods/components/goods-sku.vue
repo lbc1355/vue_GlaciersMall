@@ -4,24 +4,20 @@
       <dt>{{ item.name }}</dt>
       <dd>
         <template v-for="val in item.values" :key="val.name">
-          <img v-if="val.picture" :src="val.picture" :title="val.name" />
-          <span v-else>{{ val.name }}</span>
+          <img
+            :class="{ selected: val.selected }"
+            @click="changeSku(item, val)"
+            v-if="val.picture"
+            :src="val.picture"
+            :title="val.name"
+          />
+          <span
+            :class="{ selected: val.selected }"
+            @click="changeSku(item, val)"
+            v-else
+            >{{ val.name }}</span
+          >
         </template>
-      </dd>
-    </dl>
-    <dl>
-      <dt>尺寸</dt>
-      <dd>
-        <span class="disabled">10英寸</span>
-        <span class="selected">20英寸</span>
-        <span>30英寸</span>
-      </dd>
-    </dl>
-    <dl>
-      <dt>版本</dt>
-      <dd>
-        <span>美版</span>
-        <span>港版</span>
       </dd>
     </dl>
   </div>
@@ -34,6 +30,22 @@ export default {
       type: Object,
       default: () => ({ specs: [], skus: [] })
     }
+  },
+  setup () {
+    // 选中与取消选中 约定在每一个按钮都拥有自己的选中状态数据:selected
+    //  点击的是已经选中，只需要取消当前选中
+    //  点击的是为未选中，把同一个规格的改成为未选中，当前点击改成选中
+    const changeSku = (item, val) => {
+      if (val.selected) {
+        val.selected = false
+      } else {
+        item.values.forEach(valItem => {
+          valItem.selected = false
+        })
+        val.selected = true
+      }
+    }
+    return { changeSku }
   }
 }
 </script>
