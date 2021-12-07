@@ -23,6 +23,7 @@
           <!-- SKU -->
           <GoodsSku :goods="goods" />
         </div>
+        <hr />
       </div>
       <!-- 商品推荐 -->
       <GoodsRelevant />
