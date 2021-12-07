@@ -6,13 +6,16 @@
       <i class="iconfont icon-angle-down"></i>
     </div>
     <div class="option" v-if="visible">
-      <span
-        class="ellipsis"
-        @click="changeItem(item)"
-        v-for="item in currList"
-        :key="item.code"
-        >{{ item.name }}</span
-      >
+      <div v-if="loading" class="loading"></div>
+      <template v-else>
+        <span
+          class="ellipsis"
+          @click="changeItem(item)"
+          v-for="item in currList"
+          :key="item.code"
+          >{{ item.name }}</span
+        >
+      </template>
     </div>
   </div>
 </template>
@@ -182,6 +185,11 @@ const getCityData = () => {
       &:hover {
         background: #f5f5f5;
       }
+    }
+    .loading {
+      height: 290px;
+      width: 100%;
+      background: url(../../assets/images/loading.gif) no-repeat center;
     }
   }
 }
