@@ -129,7 +129,8 @@ const getCityData = () => {
       resolve(window.cityData)
     } else {
       // 无缓存
-      const url = 'https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/area.json'
+      // const url = 'https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/area.json'
+      const url = 'http://localhost:9000/glaciersmall/region'
       axios.get(url).then(res => {
         window.cityData = res.data
         resolve(window.cityData)

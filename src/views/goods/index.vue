@@ -21,11 +21,22 @@
         <div class="spec">
           <GoodsName :goods="goods" />
           <!-- SKU -->
-          <GoodsSku :goods="goods" />
+          <GoodsSku
+            :goods="goods"
+            skuId="1369155864430120962"
+            @change="changeSku"
+          />
+          <!-- 数量选择组件 -->
+          <XtxNumbox label="数量" v-model="num" :max="goods.inventory" />
+          <!-- 按钮组件 -->
+          <XtxButton type="primary" style="margin-top: 20px"
+            >加入购物车</XtxButton
+          >
         </div>
       </div>
       <!-- 商品推荐 -->
-      <GoodsRelevant />
+      <!-- 商品推荐 -->
+      <GoodsRelevant :goodsId="goods.id" />
       <!-- 商品详情 -->
       <div class="goods-footer">
         <div class="goods-article">
@@ -54,9 +65,20 @@ export default {
   name: 'XtxGoodsPage',
   components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
   setup () {
+    // 选择的数量
+    const num = ref(1)
     // 获取商品详情
     const goods = useGoods()
-    return { goods }
+
+    const changeSku = (sku) => {
+      if (sku.skuId) {
+        goods.value.price = sku.price
+        goods.value.oldPrice = sku.oldPrice
+        goods.value.inventory = sku.inventory
+        console.log(sku)
+      }
+    }
+    return { goods, num, changeSku }
   }
 }
 const useGoods = () => {

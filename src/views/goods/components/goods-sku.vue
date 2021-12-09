@@ -35,13 +35,14 @@ const getPathMap = (skus) => {
   // 4 根据子集王路径字典对象中存储
   skus.forEach(sku => {
     if (sku.inventory > 0 && sku.specs.length > 0) {
+      console.log(sku)
       // 计算当前有库存的sku子集
       // 可选值数组
       const valueArr = sku.specs.map(val => val.valueName)
       const valueArrPowerSert = powerSert(valueArr)
       // 遍历子集 pathMap冲入数据
       valueArrPowerSert.forEach(arr => {
-        // 根据arr得到字符串的key，约定key是['蓝色','美国']===>'蓝色-美国'
+        // 根据arr得到字符串的key，约定key是['蓝色','美国']===>'蓝色★美国'
         const key = arr.join(spliter)
         // 给pathMap设置数据
         if (pathMap[key]) {
@@ -82,16 +83,35 @@ const updateDisabledStatus = (specs, pathMap) => {
     })
   })
 }
+
+// 默认选中
+const initDefaultSelected = (goods, skuId) => {
+  // 1 找出SKU 的 信息
+  // 2 遍历每一个按钮，按钮的值和sku记录的值相同 就选中
+  const sku = goods.skus.find(sku => sku.id === skuId)
+  goods.specs.forEach((item, i) => {
+    const val = item.values.find(val => val.name === sku.specs[i].valueName)
+    val.selected = true
+  })
+}
 export default {
   name: 'GoodsSku',
   props: {
     goods: {
       type: Object,
       default: () => ({ specs: [], skus: [] })
+    },
+    skuId: {
+      type: String,
+      default: ''
     }
   },
-  setup (props) {
+  setup (props, { emit }) {
     const pathMap = getPathMap(props.goods.skus)
+    // 根据skuId 初始化选中
+    if (props.skuId) {
+      initDefaultSelected(props.goods, props.skuId)
+    }
     // 组件初始化 ： 更新按钮的禁用状态
     updateDisabledStatus(props.goods.specs, pathMap)
     // 选中与取消选中 约定在每一个按钮都拥有自己的选中状态数据:selected
@@ -111,6 +131,23 @@ export default {
       }
       // 点击按钮时：更新按钮的禁用状态
       updateDisabledStatus(props.goods.specs, pathMap)
+      // 讲你选择的SKU信息通知父组件 {skuId,price,oldPrice,inventory,specsText}
+      // 选择完整的sku组合按钮，菜可以酱信息提交父组件
+      // 不是完整的sku按钮  提交空对象父组件
+      const validSelectedValues = getSelectedValues(props.goods.specs).filter(v => v)
+      if (validSelectedValues.length === props.goods.specs.length) {
+        const skuIds = pathMap[validSelectedValues.join(spliter)]
+        const sku = props.goods.skus.find(sku => sku.id === skuIds[0])
+        emit('change', {
+          skuId: sku.id,
+          price: sku.price,
+          oldPrice: sku.oldPrice,
+          inventory: sku.inventory,
+          specsText: sku.specs.reduce((p, c) => `${p} ${c.name}:${c.valueName}`, '').trim()
+        })
+      } else {
+        emit('change', {})
+      }
     }
     return { changeSku }
   }
