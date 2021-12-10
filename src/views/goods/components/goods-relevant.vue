@@ -26,12 +26,14 @@ export default {
     // 数据结构 slider  = [[4],[4],[4],[4]]
     const sliders = ref([])
     findRelevantGoods({ id: props.goodsId }).then(data => {
-      // data.result 商品列表，数据结构[16]
-      // 轮播图 需要 四组 每组数量为4 的数据  16条拆分成轮播图需要的数据
-      const pageSize = 4
-      const pageCount = Math.ceil(data.result.length / pageSize)
-      for (let i = 0; i < pageCount; i++) {
-        sliders.value.push(data.result.slice(pageSize * i, pageSize * (i + 1)))
+      if (data.code * 1 === 1) {
+        // data.result 商品列表，数据结构[16]
+        // 轮播图 需要 四组 每组数量为4 的数据  16条拆分成轮播图需要的数据
+        const pageSize = 4
+        const pageCount = Math.ceil(data.result.length / pageSize)
+        for (let i = 0; i < pageCount; i++) {
+          sliders.value.push(data.result.slice(pageSize * i, pageSize * (i + 1)))
+        }
       }
     })
     return {

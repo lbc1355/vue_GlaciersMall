@@ -21,11 +21,7 @@
         <div class="spec">
           <GoodsName :goods="goods" />
           <!-- SKU -->
-          <GoodsSku
-            :goods="goods"
-            skuId="1369155864430120962"
-            @change="changeSku"
-          />
+          <GoodsSku :goods="goods" @change="changeSku" />
           <!-- 数量选择组件 -->
           <XtxNumbox label="数量" v-model="num" :max="goods.inventory" />
           <!-- 按钮组件 -->
@@ -35,25 +31,32 @@
         </div>
       </div>
       <!-- 商品推荐 -->
-      <!-- 商品推荐 -->
       <GoodsRelevant :goodsId="goods.id" />
       <!-- 商品详情 -->
       <div class="goods-footer">
         <div class="goods-article">
           <!-- 商品+评价 -->
-          <div class="goods-tabs"></div>
+          <div class="goods-tabs">
+            <GoodsTabs />
+          </div>
           <!-- 注意事项 -->
-          <div class="goods-warn"></div>
+          <div class="goods-warn">
+            <GoodsWarn />
+          </div>
         </div>
         <!-- 24热榜+专题推荐 -->
-        <div class="goods-aside"></div>
+        <div class="goods-aside">
+          <GoodsHot />
+          <GoodsHot :type="2" />
+          <GoodsHot :type="3" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, provide, ref, watch } from 'vue'
 import GoodsRelevant from './components/goods-relevant'
 import GoodsImage from './components/goods-image'
 import { findGoods } from '@/api/product'
@@ -61,9 +64,12 @@ import { useRoute } from 'vue-router'
 import GoodsSales from './components/goods-sales'
 import GoodsName from './components/goods-name'
 import GoodsSku from './components/goods-sku'
+import GoodsTabs from './components/goods-tabs'
+import GoodsHot from './components/goods-hot'
+import GoodsWarn from './components/goods-warn'
 export default {
   name: 'XtxGoodsPage',
-  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
+  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku, GoodsTabs, GoodsHot, GoodsWarn },
   setup () {
     // 选择的数量
     const num = ref(1)
@@ -75,12 +81,14 @@ export default {
         goods.value.price = sku.price
         goods.value.oldPrice = sku.oldPrice
         goods.value.inventory = sku.inventory
-        console.log(sku)
       }
     }
+    // 提供goods数据给后代组件使用
+    provide('goods', goods)
     return { goods, num, changeSku }
   }
 }
+
 const useGoods = () => {
   const goods = ref(null)
   const route = useRoute()
