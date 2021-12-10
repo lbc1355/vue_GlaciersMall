@@ -5,32 +5,34 @@
       <XtxBread>
         <XtxBreadItem to="/">首页</XtxBreadItem>
         <Transition name="fade-right" mode="out-in">
-          <XtxBreadItem :key="TopCategory.id">{{TopCategory.name}}</XtxBreadItem>
+          <XtxBreadItem :key="TopCategory.id">{{
+            TopCategory.name
+          }}</XtxBreadItem>
         </Transition>
       </XtxBread>
       <!-- 轮播图 -->
-      <XtxCarousel :sliders="sliders" style="height:500px" />
+      <XtxCarousel :sliders="sliders" style="height: 500px" />
       <!-- 所有二级分类 -->
       <div class="sub-list">
         <h3>全部分类</h3>
         <ul>
           <li v-for="item in TopCategory.children" :key="item.id">
             <a href="javascript:;">
-              <img :src="item.picture" >
-              <p>{{item.name}}</p>
+              <img :src="item.picture" />
+              <p>{{ item.name }}</p>
             </a>
           </li>
         </ul>
       </div>
       <!-- 各个分类推荐商品 -->
-        <div class="ref-goods" v-for="sub in subList" :key="sub.id">
+      <div class="ref-goods" v-for="sub in subList" :key="sub.id">
         <div class="head">
-          <h3>- {{sub.name}} -</h3>
+          <h3>- {{ sub.name }} -</h3>
           <p class="tag">温暖柔软，品质之选</p>
-          <XtxMore :path="`/category/sub/${sub.id}`"/>
+          <XtxMore :path="`/category/sub/${sub.id}`" />
         </div>
         <div class="body">
-          <GoodsItem v-for="good in sub.goods" :key="good.id" :good="good"/>
+          <GoodsItem v-for="good in sub.goods" :key="good.id" :good="good" />
         </div>
       </div>
     </div>
@@ -62,8 +64,6 @@ export default {
       let cate = {}
       // 当前顶级分类 ==  根据路由上的ID 去vuex中的category模块中的list中查找
       const item = store.state.category.list.find(item => {
-        console.log('item.id' + item.id)
-        console.log('route.params.id' + route.params.id)
         return item.id * 1 === route.params.id * 1
       })
       if (item) cate = item
@@ -93,16 +93,16 @@ export default {
 <style scoped lang="less">
 // 面包屑动画
 .fade-right-enter-from,
-.fade-right-leave-to{
+.fade-right-leave-to {
   transform: translateX(20px);
-  opacity: 0 ;
+  opacity: 0;
 }
 .fade-right-enter-active,
 .fade-right-leave-active {
   transition: all 0.5s;
 }
 .fade-right-enter-to,
-.fade-right-leave-from  {
+.fade-right-leave-from {
   transform: none;
   opacity: 1;
 }
@@ -143,7 +143,7 @@ export default {
       }
     }
   }
-   .ref-goods {
+  .ref-goods {
     background-color: #fff;
     margin-top: 20px;
     position: relative;

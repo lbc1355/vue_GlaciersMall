@@ -13,6 +13,6 @@ export const findGoods = (id) => {
  * @param {String} id - 商品ID
  * @param {Number} limit - 获取条数
  */
-export const findRelGoods = (id, limit = 16) => {
+export const findRelevantGoods = ({ id, limit = 16 }) => {
   return request('/goods/relevant', 'get', { id, limit })
 }

@@ -5,7 +5,7 @@ export default {
   namespaced: true,
   state () {
     return {
-    // 分类信息，依赖topCategory重新设置，保证初始化就有数据，不至于白屏
+      // 分类信息，依赖topCategory重新设置，保证初始化就有数据，不至于白屏
       list: topCategory.map(item => ({ name: item }))
     }
   },
@@ -35,7 +35,6 @@ export default {
       data.result.forEach(top => {
         top.open = false
       })
-      console.log(data)
       // 修改分类数据
       commit('setList', data.result)
     }
