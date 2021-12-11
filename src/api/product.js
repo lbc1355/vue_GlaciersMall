@@ -28,7 +28,7 @@ export const fondGoodsHot = ({ id, limit = 3, type = 1 }) => {
 }
 
 /**
- * 根据商品ID 查询评价
+ * 根据商品ID 查询评价信息
  * @param {Integer} id 商品ID
  * @returns
  */
@@ -36,4 +36,15 @@ export const findGoodsCommentInfo = (id) => {
   // return request(`/goods/${id}/evaluate`, 'get')
 
   return request(`https://mock.boxuegu.com/mock/1175/goods/${id}/evaluate`, 'get')
+}
+
+/**
+ * 查询商品评价列表
+ * @param {Integer} id 商品ID
+ * @param {object} params
+ * @returns
+ */
+export const findGoodsCommentList = (id, params) => {
+  // return request(`/goods/${id}/evaluate`, 'get')
+  return request(`https://mock.boxuegu.com/mock/1175/goods/${id}/evaluate/page`, 'get', params)
 }

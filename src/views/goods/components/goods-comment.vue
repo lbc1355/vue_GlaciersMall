@@ -27,38 +27,56 @@
     </div>
     <div class="sort">
       <span>排序：</span>
-      <a href="javascript:;" class="active">默认</a>
-      <a href="javascript:;">最新</a>
-      <a href="javascript:;">最热</a>
+      <a
+        @click="changeSort(null)"
+        :class="{ active: reqParams.sortField === null }"
+        href="javascript:;"
+        >默认</a
+      >
+      <a
+        @click="changeSort('createTime')"
+        :class="{ active: reqParams.sortField === 'createTime' }"
+        href="javascript:;"
+        >最新</a
+      >
+      <a
+        @click="changeSort('praiseCount')"
+        :class="{ active: reqParams.sortField === 'praiseCount' }"
+        href="javascript:;"
+        >最热</a
+      >
     </div>
     <!-- 列表 -->
-    <div class="list">
-      <div class="item">
+    <div class="list" v-if="commentList">
+      <div class="item" v-for="item in commentList.items" :key="item.id">
         <div class="user">
-          <img
-            src="http://zhoushugang.gitee.io/erabbit-client-pc-static/uploads/avatar_1.png"
-            alt=""
-          />
-          <span>兔****m</span>
+          <img :src="item.member.avatar" alt="" />
+          <span>{{ formatNickname(item.member.nickname) }}</span>
         </div>
         <div class="body">
           <div class="score">
-            <i class="iconfont icon-wjx01"></i>
-            <i class="iconfont icon-wjx01"></i>
-            <i class="iconfont icon-wjx01"></i>
-            <i class="iconfont icon-wjx01"></i>
-            <i class="iconfont icon-wjx02"></i>
-            <span class="attr">颜色：黑色 尺码：M</span>
+            <i
+              class="iconfont icon-wjx01"
+              v-for="i in item.score"
+              :key="i + 's'"
+            ></i>
+            <i
+              v-for="i in 5 - item.score"
+              :key="i + 'k'"
+              class="iconfont icon-wjx02"
+            ></i>
+            <span class="attr">{{ formatSpecs(item.orderInfo.specs) }}</span>
           </div>
           <div class="text">
-            网易云app上这款耳机非常不错 新人下载网易云购买这款耳机优惠大
-            而且耳机🎧确实正品 音质特别好 戴上这款耳机
-            听音乐看电影效果声音真是太棒了 无线方便 小盒自动充电
-            最主要是质量好音质棒 想要买耳机的放心拍 音效巴巴滴 老棒了
+            {{ item.content }}
           </div>
+          <!-- 评论图片组件 -->
+          <GoodsCommentImage v-if="item.pictures" :pictures="item.pictures" />
           <div class="time">
-            <span>2020-10-10 10:11:22</span>
-            <span class="zan"><i class="iconfont icon-dianzan"></i>100</span>
+            <span>{{ item.createTime }}</span>
+            <span class="zan"
+              ><i class="iconfont icon-dianzan"></i>{{ item.praiseCount }}</span
+            >
           </div>
         </div>
       </div>
@@ -66,17 +84,19 @@
   </div>
 </template>
 <script>
-import { inject, ref } from 'vue'
-import { findGoodsCommentInfo } from '@/api/product'
+import { inject, reactive, ref, watch } from 'vue'
+import { findGoodsCommentInfo, findGoodsCommentList } from '@/api/product'
+import GoodsCommentImage from './goods-comment-image'
 export default {
   name: 'GoodsComment',
+  components: { GoodsCommentImage },
   setup () {
     // 获取评价信息
     const commentInfo = ref(null)
     const goods = inject('goods')
     findGoodsCommentInfo(goods.value.id).then(data => {
-      data.result.tags.unshift({ title: '有图', tagCount: data.result.hasPictureCount })
-      data.result.tags.unshift({ title: '全部评价', tagCount: data.result.evaluateCount })
+      data.result.tags.unshift({ title: '有图', tagCount: data.result.hasPictureCount, type: 'img' })
+      data.result.tags.unshift({ title: '全部评价', tagCount: data.result.evaluateCount, type: 'all' })
 
       // 设置数据之前， tags数组前追加 有图tag 全部评价tag
       commentInfo.value = data.result
@@ -86,11 +106,60 @@ export default {
     const currentTagIndex = ref(0)
     const changeTag = (i) => {
       currentTagIndex.value = i
+      // 点击tag的时候修改筛选条件
+      const tag = commentInfo.value.tags[i]
+      if (tag.type === 'all') {
+        reqParams.hasPicture = null
+        reqParams.tag = null
+      } else if (tag.type === 'img') {
+        reqParams.hasPicture = true
+        reqParams.tag = null
+      } else {
+        reqParams.hasPicture = null
+        reqParams.tag = tag.title
+      }
+      // 页码重置到1
+      reqParams.page = 1
+    }
+
+    // 准备筛选条件数据
+    const reqParams = reactive({
+      page: 1,
+      pageSize: 10,
+      hasPicture: null,
+      tag: null,
+      // 排序方式 [praiseCount 热度 createTime 最新]
+      sortField: null
+    })
+
+    const commentList = ref([])
+    watch(reqParams, () => {
+      findGoodsCommentList(goods.id, reqParams).then(data => {
+        commentList.value = data.result
+      })
+    }, { immediate: true })
+
+    const changeSort = (sortFiled) => {
+      reqParams.sortField = sortFiled
+      // 页码重置到1
+      reqParams.page = 1
+    }
+
+    const formatSpecs = (specs) => {
+      return specs.reduce((p, c) => `${p} ${c.name}: ${c.nameValue}`, '').trim()
+    }
+    const formatNickname = (nickname) => {
+      return nickname.substr(0, 1) + '****' + nickname.substr(-1)
     }
     return {
       commentInfo,
       currentTagIndex,
-      changeTag
+      changeTag,
+      reqParams,
+      changeSort,
+      commentList,
+      formatSpecs,
+      formatNickname
     }
   }
 }
