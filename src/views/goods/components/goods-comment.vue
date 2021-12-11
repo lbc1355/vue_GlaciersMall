@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div class="sort">
+    <div class="sort" v-if="commentInfo">
       <span>排序：</span>
       <a
         @click="changeSort(null)"
@@ -81,6 +81,13 @@
         </div>
       </div>
     </div>
+    <XtxPagination
+      v-if="total"
+      @current-path="changePagerFn"
+      :total="total"
+      :page-size="reqParams.pageSize"
+      :current-page="reqParams.page"
+    />
   </div>
 </template>
 <script>
@@ -133,9 +140,11 @@ export default {
     })
 
     const commentList = ref([])
+    const total = ref(0)
     watch(reqParams, () => {
-      findGoodsCommentList(goods.id, reqParams).then(data => {
+      findGoodsCommentList(goods.value.id, reqParams).then(data => {
         commentList.value = data.result
+        total.value = data.result.counts
       })
     }, { immediate: true })
 
@@ -151,6 +160,10 @@ export default {
     const formatNickname = (nickname) => {
       return nickname.substr(0, 1) + '****' + nickname.substr(-1)
     }
+
+    const changePagerFn = (newPage) => {
+      reqParams.page = newPage
+    }
     return {
       commentInfo,
       currentTagIndex,
@@ -159,7 +172,9 @@ export default {
       changeSort,
       commentList,
       formatSpecs,
-      formatNickname
+      formatNickname,
+      total,
+      changePagerFn
     }
   }
 }
