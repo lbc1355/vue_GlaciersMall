@@ -1,23 +1,25 @@
 <template>
-  <div class="xtx-message" :style="style[type]">
-    <!-- 上面绑定的是样式 -->
-    <!-- 不同提示图标会变 -->
-    <i class="iconfont" :class="[style[type].icon]"></i>
-    <span class="text">{{ text }}</span>
-  </div>
+  <Transition name="down">
+    <div class="xtx-message" :style="style[type]" v-show="visible">
+      <!-- 上面绑定的是样式 -->
+      <!-- 不同提示图标会变 :class="{'icon-warning':true}" :class="['icon-warning']" -->
+      <i class="iconfont" :class="[style[type].icon]"></i>
+      <span class="text">{{ text }}</span>
+    </div>
+  </Transition>
 </template>
 <script>
+import { onMounted, ref } from 'vue'
 export default {
   name: 'XtxMessage',
   props: {
+    type: {
+      type: String,
+      default: 'warn'
+    },
     text: {
       type: String,
       default: ''
-    },
-    type: {
-      type: String,
-      // warn 警告  error 错误  success 成功
-      default: 'warn'
     }
   },
   setup () {
@@ -42,11 +44,31 @@ export default {
         borderColor: 'rgb(225, 243, 216)'
       }
     }
-    return { style }
+    // 控制元素显示隐藏
+    const visible = ref(false)
+    onMounted(() => {
+      visible.value = true
+    })
+    return { style, visible }
   }
 }
 </script>
 <style scoped lang="less">
+.down {
+  &-enter {
+    &-from {
+      transform: translate3d(0, -75px, 0);
+      opacity: 0;
+    }
+    &-active {
+      transition: all 0.5s;
+    }
+    &-to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+}
 .xtx-message {
   width: 300px;
   height: 50px;

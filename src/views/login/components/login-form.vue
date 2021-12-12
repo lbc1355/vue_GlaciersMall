@@ -121,6 +121,8 @@
 import { reactive, ref, watch } from 'vue'
 import { Form, Field } from 'vee-validate'
 import schema from '@/utils/vee-validate-schema'
+import Message from '@/components/library/Message'
+
 export default {
   name: 'LoginForm',
   components: {
@@ -170,6 +172,7 @@ export default {
       // 返回的是一个promise
       formCom.value.validate().then(value => {
         console.log(value)
+        Message({ type: 'error', text: '用户名或密码错误' })
       })
     }
     return { isMsgLogin, form, schema: mySchema, formCom, login }
