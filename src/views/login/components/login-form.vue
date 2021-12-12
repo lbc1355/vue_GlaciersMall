@@ -122,7 +122,9 @@ import { reactive, ref, watch } from 'vue'
 import { Form, Field } from 'vee-validate'
 import schema from '@/utils/vee-validate-schema'
 import Message from '@/components/library/Message'
-
+import { userAccountLogin } from '@/api/user'
+import { useStore } from 'vuex'
+import { useRoute, useRouter } from 'vue-router'
 export default {
   name: 'LoginForm',
   components: {
@@ -167,13 +169,31 @@ export default {
     })
 
     // 点击登录的时候对整体表单进行校验
-    const login = () => {
+    const store = useStore()
+    const route = useRoute()
+    const router = useRouter()
+    const login = async () => {
       // Form组件提供了一个validate函数作为整体表单校验
       // 返回的是一个promise
-      formCom.value.validate().then(value => {
-        console.log(value)
-        Message({ type: 'error', text: '用户名或密码错误' })
-      })
+      const valid = await formCom.value.validate()
+      // 如果校验成功
+      if (valid) {
+        const { account, password } = form
+        userAccountLogin({ account, password }).then(data => {
+          // 存储用户信息
+          console.log(data.result)
+          const { id, account, avatar, mobile, nickname, token } = data.result
+          store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+          // 进行跳转
+          router.push(route.query.redirectUrl || '/')
+          // 消息提示
+          Message({ type: 'success', text: '登录成功' })
+        }).catch(e => {
+          if (e.response.data) {
+            Message({ type: 'error', text: e.response.data.message || '登陆失败' })
+          }
+        })
+      }
     }
     return { isMsgLogin, form, schema: mySchema, formCom, login }
   }
