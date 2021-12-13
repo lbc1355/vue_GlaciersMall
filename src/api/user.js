@@ -10,3 +10,22 @@ import request from '@/utils/request'
 export const userAccountLogin = ({ account, password }) => {
   return request('/login', 'post', { account, password })
 }
+
+/**
+ * 获取手机验证码
+ * @param {*} mobile
+ * @returns
+ */
+export const userMobileLoginMsg = (mobile) => {
+  return request('/login/code', 'get', { mobile })
+}
+
+/**
+ * 手机号登录
+ * @param {String} mobile - 手机号
+ * @param {String} code - 短信验证码，默认123456
+ * @returns promise
+ */
+export const userMobileLogin = ({ mobile, code }) => {
+  return request('/login/code', 'post', { mobile, code })
+}
