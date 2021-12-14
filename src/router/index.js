@@ -6,6 +6,7 @@ const TopCaegory = () => import('@/views/category/index')
 const SubCaegory = () => import('@/views/category/sub')
 const Goods = () => import('@/views/goods/index')
 const Login = () => import('@/views/login/index')
+const Cart = () => import('@/views/cart/index')
 
 // 路由规则
 const routes = [
@@ -17,7 +18,8 @@ const routes = [
       { path: '/', component: Home },
       { path: '/category/:id', component: TopCaegory },
       { path: '/category/sub/:id', component: SubCaegory },
-      { path: '/product/:id', component: Goods }
+      { path: '/product/:id', component: Goods },
+      { path: '/cart', component: Cart }
 
     ]
   },
