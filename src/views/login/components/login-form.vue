@@ -230,12 +230,18 @@ export default {
       if (valid === true) {
         // 通过
         if (time.value === 0) {
-          console.log('发送了')
-          // 没有倒计时才可以发送
-          await userMobileLoginMsg(form.mobile)
-          Message({ type: 'success', text: '发送成功' })
-          time.value = 60
-          resume()
+          try {
+            // 没有倒计时才可以发送
+            await userMobileLoginMsg(form.mobile)
+
+            Message({ type: 'success', text: '发送成功' })
+            time.value = 60
+            resume()
+          } catch (e) {
+            if (e.response.data) {
+              Message({ type: 'error', text: e.response.data.message || '验证码发送失败' })
+            }
+          }
         }
         // 没有倒计时才可以发送
       } else {
