@@ -145,7 +145,7 @@ export default {
           price: sku.price,
           oldPrice: sku.oldPrice,
           inventory: sku.inventory,
-          specsText: sku.specs.reduce((p, c) => `${p} ${c.name}:${c.valueName}`, '').trim()
+          specsText: sku.specs.reduce((p, c) => `${p} ${c.name}：${c.valueName}`, '').trim()
         })
       } else {
         emit('change', {})

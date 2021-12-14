@@ -25,7 +25,10 @@
           <!-- 数量选择组件 -->
           <XtxNumbox label="数量" v-model="num" :max="goods.inventory" />
           <!-- 按钮组件 -->
-          <XtxButton type="primary" style="margin-top: 20px"
+          <XtxButton
+            @click="insertCart()"
+            type="primary"
+            style="margin-top: 20px"
             >加入购物车</XtxButton
           >
         </div>
@@ -67,6 +70,8 @@ import GoodsSku from './components/goods-sku'
 import GoodsTabs from './components/goods-tabs'
 import GoodsHot from './components/goods-hot'
 import GoodsWarn from './components/goods-warn'
+import { useStore } from 'vuex'
+import Message from '@/components/library/Message'
 export default {
   name: 'XtxGoodsPage',
   components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku, GoodsTabs, GoodsHot, GoodsWarn },
@@ -82,10 +87,40 @@ export default {
         goods.value.oldPrice = sku.oldPrice
         goods.value.inventory = sku.inventory
       }
+      console.log(sku)
+      // 记录选择后的SKU 有，也可能没有
+      currSku.value = sku
     }
     // 提供goods数据给后代组件使用
     provide('goods', goods)
-    return { goods, num, changeSku }
+
+    const store = useStore()
+    const currSku = ref(null)
+    const insertCart = () => {
+      if (currSku.value && currSku.value.skuId) {
+        // id skuId name attrsText picture price nowPrice selected stock count isEffective
+        const { skuId, specsText: attrsText, inventory: stock } = currSku.value
+        const { id, name, price, mainPictures } = goods.value
+        store.dispatch('cart/insertCart', {
+          skuId,
+          attrsText,
+          stock,
+          id,
+          name,
+          price,
+          nowPrice: price,
+          picture: mainPictures[0],
+          selected: true,
+          isEffective: true,
+          count: num.value
+        }).then(() => {
+          Message({ type: 'success', text: '加入购物车成功' })
+        })
+      } else {
+        Message({ text: '请选择完整规格' })
+      }
+    }
+    return { goods, num, changeSku, insertCart }
   }
 }
 
