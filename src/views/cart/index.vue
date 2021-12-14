@@ -10,7 +10,9 @@
           <thead>
             <tr>
               <th width="120">
-                <XtxCheckbox :modelValue="$store.getters['cart/isCheckAll']"
+                <XtxCheckbox
+                  @change="checkAll"
+                  :modelValue="$store.getters['cart/isCheckAll']"
                   >全选</XtxCheckbox
                 >
               </th>
@@ -27,7 +29,12 @@
               v-for="goods in $store.getters['cart/validList']"
               :key="goods.skuId"
             >
-              <td><XtxCheckbox :modelValue="goods.selected" /></td>
+              <td>
+                <XtxCheckbox
+                  @change="($event) => checkOne(goods.skuId, $event)"
+                  :modelValue="goods.selected"
+                />
+              </td>
               <td>
                 <div class="goods">
                   <RouterLink :to="`/product/${goods.id}`"
@@ -112,7 +119,9 @@
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
-          <XtxCheckbox :modeValue="$store.getters['cart/isCheckAll']"
+          <XtxCheckbox
+            :modeValue="$store.getters['cart/isCheckAll']"
+            @change="checkAll"
             >全选</XtxCheckbox
           >
           <a href="javascript:;">删除商品</a>
@@ -133,9 +142,24 @@
 </template>
 <script>
 import GoodRelevant from '@/views/goods/components/goods-relevant'
+import { useStore } from 'vuex'
 export default {
   name: 'XtxCartPage',
-  components: { GoodRelevant }
+  components: { GoodRelevant },
+  setup () {
+    const store = useStore()
+    const checkOne = (skuId, selected) => {
+      store.dispatch('cart/updateCart', { skuId, selected })
+    }
+
+    const checkAll = (selected) => {
+      store.dispatch('cart/checkAllCart', selected)
+    }
+    return {
+      checkOne,
+      checkAll
+    }
+  }
 }
 </script>
 <style scoped lang="less">
