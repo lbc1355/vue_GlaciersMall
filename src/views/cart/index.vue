@@ -25,6 +25,12 @@
           </thead>
           <!-- 有效商品 -->
           <tbody>
+            <!-- 没有商品 -->
+            <tr v-if="$store.getters['cart/validList'].length === 0">
+              <td colspan="6">
+                <CartNone />
+              </td>
+            </tr>
             <tr
               v-for="goods in $store.getters['cart/validList']"
               :key="goods.skuId"
@@ -45,6 +51,7 @@
                       {{ goods.name }}
                     </p>
                     <!-- 选择规格组件 -->
+                    <CartSku />
                   </div>
                 </div>
               </td>
@@ -58,7 +65,12 @@
                 </p>
               </td>
               <td class="tc">
-                <XtxNumbox :modelValue="goods.count" />
+                <!-- 数量 -->
+                <XtxNumbox
+                  @change="($event) => updateCount(goods.skuId, $event)"
+                  :max="goods.stock"
+                  :modelValue="goods.count"
+                />
               </td>
               <td class="tc">
                 <p class="f16 red">
@@ -69,7 +81,14 @@
               </td>
               <td class="tc">
                 <p><a href="javascript:;">移入收藏夹</a></p>
-                <p><a class="green" href="javascript:;">删除</a></p>
+                <p>
+                  <a
+                    @click="deleteCart(goods.skuId)"
+                    class="green"
+                    href="javascript:;"
+                    >删除</a
+                  >
+                </p>
                 <p><a href="javascript:;">找相似</a></p>
               </td>
             </tr>
@@ -109,24 +128,32 @@
                 </p>
               </td>
               <td class="tc">
-                <p><a class="green" href="javascript:;">删除</a></p>
+                <p>
+                  <a
+                    @click="deleteCart(goods.skuId)"
+                    class="green"
+                    href="javascript:;"
+                    >删除</a
+                  >
+                </p>
                 <p><a href="javascript:;">找相似</a></p>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
       <!-- 操作栏 -->
       <div class="action">
         <div class="batch">
           <XtxCheckbox
-            :modeValue="$store.getters['cart/isCheckAll']"
             @change="checkAll"
+            :modelValue="$store.getters['cart/isCheckAll']"
             >全选</XtxCheckbox
           >
-          <a href="javascript:;">删除商品</a>
+          <a @click="batchDeleteCart()" href="javascript:;">删除商品</a>
           <a href="javascript:;">移入收藏夹</a>
-          <a href="javascript:;">清空失效商品</a>
+          <a @click="batchDeleteCart(true)" href="javascript:;">清空失效商品</a>
         </div>
         <div class="total">
           共 {{ $store.getters["cart/validTotal"] }} 件商品，已选择
@@ -142,10 +169,14 @@
 </template>
 <script>
 import GoodRelevant from '@/views/goods/components/goods-relevant'
+import CartNone from './components/cart-none'
 import { useStore } from 'vuex'
+import Message from '@/components/library/Message.js'
+import Confirm from '@/components/library/Confirm.js'
+import CartSku from './components/cart-sku'
 export default {
   name: 'XtxCartPage',
-  components: { GoodRelevant },
+  components: { GoodRelevant, CartNone, CartSku },
   setup () {
     const store = useStore()
     const checkOne = (skuId, selected) => {
@@ -155,9 +186,31 @@ export default {
     const checkAll = (selected) => {
       store.dispatch('cart/checkAllCart', selected)
     }
+    // 删除一个商品
+    const deleteCart = (skuId) => {
+      Confirm({ text: '亲，您是否确认删除商品' }).then(() => {
+        store.dispatch('cart/deleteCart', skuId).then(() => {
+          Message({ type: 'success', text: '删除成功' })
+        })
+      }).catch(e => { })
+    }
+
+    // 批量删除选中商品,也支持清空无效商品
+    const batchDeleteCart = (isClear) => {
+      Confirm({ text: `亲，您是否确认删除${isClear ? '失效' : '选中'}的商品` }).then(() => {
+        store.dispatch('cart/batchDeleteCart', isClear)
+      }).catch(e => { })
+    }
+    // 修改数量
+    const updateCount = (skuId, count) => {
+      store.dispatch('cart/updateCart', { skuId, count })
+    }
     return {
       checkOne,
-      checkAll
+      checkAll,
+      deleteCart,
+      batchDeleteCart,
+      updateCount
     }
   }
 }

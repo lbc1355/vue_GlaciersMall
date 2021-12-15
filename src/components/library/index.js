@@ -6,6 +6,9 @@
 // import XtxBread from './xtx-bread.vue'
 // import XtxBreadItem from './xtx-bread-item.vue'
 import defaultImg from '@/assets/images/200.png'
+
+import Message from './Message'
+import Confirm from './Confirm'
 const importFn = require.context('./', false, /\.vue$/)
 export default {
   install (app) {
@@ -16,12 +19,18 @@ export default {
     // app.component(XtxMore.name, XtxMore)
     // app.component(XtxBread.name, XtxBread)
     // app.component(XtxBreadItem.name, XtxBreadItem)
-    // 定义指令
+    // 根据key批量注册
     importFn.keys().forEach(path => {
       const component = importFn(path).default
       app.component(component.name, component)
     })
+    // 定义指令
     defineDirective(app)
+
+    // 定义原型函数
+
+    app.config.globalProperties.$message = Message
+    app.config.globalProperties.$confirm = Confirm
   }
 }
 

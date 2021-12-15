@@ -15,13 +15,11 @@
     </div>
     <!-- 小图  -->
     <ul class="small">
-      <li
-        v-for="(img, i) in images"
-        :key="img"
-        :class="{ active: i === currIndex }"
-      >
-        <img @mouseenter="currIndex = i" :src="img" alt="" />
-      </li>
+      <template v-for="(img, i) in images" :key="img">
+        <li v-if="i <= 4" :class="{ active: i === currIndex }">
+          <img v-if="i <= 4" @mouseenter="currIndex = i" :src="img" alt="" />
+        </li>
+      </template>
     </ul>
   </div>
 </template>
