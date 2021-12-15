@@ -51,7 +51,11 @@
                       {{ goods.name }}
                     </p>
                     <!-- 选择规格组件 -->
-                    <CartSku />
+                    <CartSku
+                      @change="($event) => updateCartSku(goods.skuId, $event)"
+                      :skuId="goods.skuId"
+                      :attrsText="goods.attrsText"
+                    />
                   </div>
                 </div>
               </td>
@@ -205,12 +209,18 @@ export default {
     const updateCount = (skuId, count) => {
       store.dispatch('cart/updateCart', { skuId, count })
     }
+
+    // 修改规格
+    const updateCartSku = (oldSkuId, newSku) => {
+      store.dispatch('cart/updateCartSku', { oldSkuId, newSku })
+    }
     return {
       checkOne,
       checkAll,
       deleteCart,
       batchDeleteCart,
-      updateCount
+      updateCount,
+      updateCartSku
     }
   }
 }
