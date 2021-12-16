@@ -22,8 +22,8 @@
       <a href="javascript:;">修改地址</a>
     </div>
     <div class="action">
-      <XtxButton @click="openDialog()" type="gray">切换地址</XtxButton>
-      <XtxButton type="primary">确认</XtxButton>
+      <XtxButton @click="openDialog()" class="btn">切换地址</XtxButton>
+      <XtxButton @click="openAddressEdit()" class="btn">添加地址</XtxButton>
     </div>
   </div>
   <!-- 对话框组件-切换收货地址 -->
@@ -59,9 +59,12 @@
       <XtxButton @click="confirmAddressFn" type="primary">确认</XtxButton>
     </template>
   </XtxDialog>
+
+  <AddressEdit ref="addressEditCom" />
 </template>
 <script>
 import { ref } from 'vue'
+import AddressEdit from './address-edit.vue'
 export default {
   name: 'CheckoutAddress',
   props: {
@@ -70,6 +73,9 @@ export default {
       type: Array,
       default: () => []
     }
+  },
+  components: {
+    AddressEdit
   },
   // 1. 在拥有根元素的组件中，触发自定义事件，有没有emits选项无所谓
   // 2. 如果你的组件渲染的代码片段，vue3.0规范，需要在emits中申明你所触发的自定义事件
@@ -116,12 +122,21 @@ export default {
       selectedAddress.value = null
       visibleDialog.value = true
     }
+
+    // 打开添加编辑收货地址组件
+    const addressEditCom = ref(null)
+    const openAddressEdit = () => {
+      // 添加 {}  修改 {数据}
+      addressEditCom.value.open()
+    }
     return {
       showAddress,
       visibleDialog,
       selectedAddress,
       confirmAddressFn,
-      openDialog
+      openDialog,
+      openAddressEdit,
+      addressEditCom
     }
   }
 }
