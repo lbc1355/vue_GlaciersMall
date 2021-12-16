@@ -10,7 +10,10 @@
         <!-- 收货地址 -->
         <h3 class="box-title">收货地址</h3>
         <div class="box-body">
-          <CheckoutAddress :list="order.userAddresses" />
+          <CheckoutAddress
+            @change="changeAddress"
+            :list="order.userAddresses"
+          />
         </div>
         <!-- 商品信息 -->
         <h3 class="box-title">商品信息</h3>
@@ -106,7 +109,14 @@ export default {
     createOrder().then(data => {
       order.value = data.result
     })
-    return { order }
+
+    // 提交订单需要收获地址ID
+    const addressId = ref(null)
+    const changeAddress = (id) => {
+      addressId.value = id
+      console.log(id)
+    }
+    return { order, changeAddress }
   }
 }
 </script>
@@ -124,59 +134,6 @@ export default {
     }
     .box-body {
       padding: 20px 0;
-    }
-  }
-}
-.address {
-  border: 1px solid #f5f5f5;
-  display: flex;
-  align-items: center;
-  .text {
-    flex: 1;
-    min-height: 90px;
-    display: flex;
-    align-items: center;
-    .none {
-      line-height: 90px;
-      color: #999;
-      text-align: center;
-      width: 100%;
-    }
-    > ul {
-      flex: 1;
-      padding: 20px;
-      li {
-        line-height: 30px;
-        span {
-          color: #999;
-          margin-right: 5px;
-          > i {
-            width: 0.5em;
-            display: inline-block;
-          }
-        }
-      }
-    }
-    > a {
-      color: @xtxColor;
-      width: 160px;
-      text-align: center;
-      height: 90px;
-      line-height: 90px;
-      border-right: 1px solid #f5f5f5;
-    }
-  }
-  .action {
-    width: 420px;
-    text-align: center;
-    .btn {
-      width: 140px;
-      height: 46px;
-      line-height: 44px;
-      font-size: 14px;
-      &:first-child {
-        margin-right: 10px;
-      }
     }
   }
 }

@@ -22,10 +22,43 @@
       <a href="javascript:;">修改地址</a>
     </div>
     <div class="action">
-      <XtxButton class="btn">切换地址</XtxButton>
-      <XtxButton class="btn">添加地址</XtxButton>
+      <XtxButton @click="openDialog()" type="gray">切换地址</XtxButton>
+      <XtxButton type="primary">确认</XtxButton>
     </div>
   </div>
+  <!-- 对话框组件-切换收货地址 -->
+  <XtxDialog title="切换收货地址" v-model:visible="visibleDialog">
+    <div
+      @click="selectedAddress = item"
+      :class="{ active: selectedAddress && selectedAddress.id === item.id }"
+      class="text item"
+      v-for="item in list"
+      :key="item.id"
+    >
+      <ul>
+        <li>
+          <span>收<i />货<i />人：</span>{{ item.receiver }}
+        </li>
+        <li>
+          <span>联系方式：</span
+          >{{ item.contact.replace(/^(\d{3})\d{4}(\d{4})$/, "$1****$2") }}
+        </li>
+        <li>
+          <span>收货地址：</span
+          >{{ item.fullLocation.replace(/ /g, "") + item.address }}
+        </li>
+      </ul>
+    </div>
+    <template #footer>
+      <XtxButton
+        @click="visibleDialog = false"
+        type="gray"
+        style="margin-right: 20px"
+        >取消</XtxButton
+      >
+      <XtxButton @click="confirmAddressFn" type="primary">确认</XtxButton>
+    </template>
+  </XtxDialog>
 </template>
 <script>
 import { ref } from 'vue'
@@ -38,6 +71,10 @@ export default {
       default: () => []
     }
   },
+  // 1. 在拥有根元素的组件中，触发自定义事件，有没有emits选项无所谓
+  // 2. 如果你的组件渲染的代码片段，vue3.0规范，需要在emits中申明你所触发的自定义事件
+  // 3. 提倡：你发了自定义事件，需要在emits选项申明下，代码可读性很高
+  emits: ['change'],
   setup (props, { emit }) {
     // 1. 找到默认收货地址
     // 2. 没有默认收货地址，使用第一条收货地址
@@ -53,10 +90,66 @@ export default {
         showAddress.value = props.list[0]
       }
     }
+
+    // 默认通知父组件一个收货地址ID
+    emit('change', showAddress.value && showAddress.value.id)
+
+    // 显示隐藏
+    const visibleDialog = ref(false)
+
+    // 记录当前你选中的地址ID
+    const selectedAddress = ref(null)
+
+    const confirmAddressFn = () => {
+      // 显示的地址换成选中的地址
+      showAddress.value = selectedAddress.value
+      // 把选中的地址ID通知结算组件
+      emit('change', selectedAddress.value?.id)
+      // 关闭对话框
+      visibleDialog.value = false
+      // 数据使用完毕置空
+      selectedAddress.value = null
+    }
+
+    const openDialog = () => {
+      // 将之前的地址改为null
+      selectedAddress.value = null
+      visibleDialog.value = true
+    }
+    return {
+      showAddress,
+      visibleDialog,
+      selectedAddress,
+      confirmAddressFn,
+      openDialog
+    }
   }
 }
 </script>
 <style scoped lang="less">
+.xtx-dialog {
+  .text {
+    flex: 1;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    &.item {
+      border: 1px solid #f5f5f5;
+      margin-bottom: 10px;
+      cursor: pointer;
+      &.active,
+      &:hover {
+        border-color: @xtxColor;
+        background: lighten(@xtxColor, 50%);
+      }
+      > ul {
+        padding: 10px;
+        font-size: 14px;
+        line-height: 30px;
+      }
+    }
+  }
+}
 .checkout-address {
   border: 1px solid #f5f5f5;
   display: flex;
