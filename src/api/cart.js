@@ -2,7 +2,6 @@
 import request from '@/utils/request'
 
 /**
- *  TODO
  * 获取商品的 最新价格  库存  是否有效
  * @param {String} skuId - SKU id
  */
@@ -11,7 +10,6 @@ export const getNewCartGoods = (skuId) => {
 }
 
 /**
- *  TODO
  *  获取商品对应的sku数据
  *  @param {String} skuId - SKU id
  */
@@ -20,7 +18,6 @@ export const getGoodsSku = (skuId) => {
 }
 
 /**
- * TODO
  * 合并购物车
  * @param {Array<object>} cartList - 购物车信息列表
  * @param {String} object.skuId - SKUID
@@ -32,7 +29,6 @@ export const mergeCart = (cartList) => {
 }
 
 /**
- * TODO
  * 获取购物车列表
  * @returns
  */
@@ -41,7 +37,6 @@ export const findCart = () => {
 }
 
 /**
- * TODO
  * 将商品发送给后端 加入购物车
  * @param {String} skuId - SKUID
  * @param {Integer} count - 加入购物车数量
@@ -52,7 +47,6 @@ export const insertCart = ({ skuId, count }) => {
 }
 
 /**
- * TODO
  * 删除购物车商品，支批量
  * @param {Array<string>} ids - skuId 的集合
  */
@@ -61,7 +55,6 @@ export const deleteCart = (ids) => {
 }
 
 /**
- * TODO
  * 修改购物车商品（状态，数量）
  * @param {String} skuId - SKUID
  * @param {Integer} count - 加入购物车数量
@@ -73,7 +66,6 @@ export const updateCart = ({ skuId, selected, count }) => {
 }
 
 /**
- * TODO
  * 全部选中&取消全选
  * @param {Boolean} selected - 选中状态
  * @param {Array<string>} ids - skuId 的集合

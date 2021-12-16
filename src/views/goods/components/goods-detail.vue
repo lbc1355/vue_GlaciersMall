@@ -1,5 +1,5 @@
 <template>
-  <div class="goods-detail">
+  <div v-if="goods.details" class="goods-detail">
     <!-- 属性 -->
     <ul class="attrs">
       <li v-for="item in goods.details.properties" :key="item.value">
@@ -23,6 +23,7 @@ export default {
   name: 'GoodsDetail',
   setup () {
     const goods = inject('goods')
+    console.log(goods)
     return { goods }
   }
 }
