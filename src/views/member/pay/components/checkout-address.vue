@@ -19,11 +19,16 @@
           }}{{ showAddress.address }}
         </li>
       </ul>
-      <a href="javascript:;">修改地址</a>
+      <a
+        @click="openAddressEdit(showAddress)"
+        v-if="showAddress"
+        href="javascript:;"
+        >修改地址</a
+      >
     </div>
     <div class="action">
       <XtxButton @click="openDialog()" class="btn">切换地址</XtxButton>
-      <XtxButton @click="openAddressEdit()" class="btn">添加地址</XtxButton>
+      <XtxButton @click="openAddressEdit({})" class="btn">添加地址</XtxButton>
     </div>
   </div>
   <!-- 对话框组件-切换收货地址 -->
@@ -59,23 +64,21 @@
       <XtxButton @click="confirmAddressFn" type="primary">确认</XtxButton>
     </template>
   </XtxDialog>
-
-  <AddressEdit ref="addressEditCom" />
+  <!-- 收货地址添加编辑组件 -->
+  <AddressEdit @on-success="successHandler" ref="addressEditCom" />
 </template>
 <script>
 import { ref } from 'vue'
-import AddressEdit from './address-edit.vue'
+import AddressEdit from './address-edit'
 export default {
   name: 'CheckoutAddress',
+  components: { AddressEdit },
   props: {
     // 收货地址列表
     list: {
       type: Array,
       default: () => []
     }
-  },
-  components: {
-    AddressEdit
   },
   // 1. 在拥有根元素的组件中，触发自定义事件，有没有emits选项无所谓
   // 2. 如果你的组件渲染的代码片段，vue3.0规范，需要在emits中申明你所触发的自定义事件
@@ -100,35 +103,47 @@ export default {
     // 默认通知父组件一个收货地址ID
     emit('change', showAddress.value && showAddress.value.id)
 
-    // 显示隐藏
+    // 切换地址对话框显示隐藏
     const visibleDialog = ref(false)
-
     // 记录当前你选中的地址ID
     const selectedAddress = ref(null)
-
     const confirmAddressFn = () => {
-      // 显示的地址换成选中的地址
+      // 显示的地址换成呢选中的地址
       showAddress.value = selectedAddress.value
       // 把选中的地址ID通知结算组件
       emit('change', selectedAddress.value?.id)
-      // 关闭对话框
       visibleDialog.value = false
-      // 数据使用完毕置空
-      selectedAddress.value = null
     }
-
     const openDialog = () => {
-      // 将之前的地址改为null
+      // 将之前的选中地址改成null
       selectedAddress.value = null
       visibleDialog.value = true
     }
 
     // 打开添加编辑收货地址组件
     const addressEditCom = ref(null)
-    const openAddressEdit = () => {
+    const openAddressEdit = (address) => {
       // 添加 {}  修改 {数据}
-      addressEditCom.value.open()
+      addressEditCom.value.open(address)
     }
+    const successHandler = (formData) => {
+      // 根据formData中的ID去当前地址列表中查找，有就是修改，否则是添加
+      const address = props.list.find(item => item.id === formData.id)
+      if (address) {
+        for (const key in address) {
+          address[key] = formData[key]
+        }
+      } else {
+        // 如果是添加：往list中追加一条
+        // 当你在修改formData的时候，数组中的数据也会更新，因为是同一引用地址。
+        // 啥时候修改formData，当你打开对话框需要清空之前的输入信息
+        // 克隆formData数据
+        const jsonStr = JSON.stringify(formData)
+        // eslint-disable-next-line vue/no-mutating-props
+        props.list.unshift(JSON.parse(jsonStr))
+      }
+    }
+
     return {
       showAddress,
       visibleDialog,
@@ -136,7 +151,8 @@ export default {
       confirmAddressFn,
       openDialog,
       openAddressEdit,
-      addressEditCom
+      addressEditCom,
+      successHandler
     }
   }
 }
